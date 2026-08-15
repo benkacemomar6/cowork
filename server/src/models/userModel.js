@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
 name:{type:String,required:true,trim:true},
 email:{type:String,required:true,trim:true,unique:true},
 password:{type:String,required:true,trim:true,minlength:6},
-role:{type:String,default:'user',enum:['client','admin',"freelancer"]},
+role:{type:String,default:'client',enum:['client','admin','freelancer']},
 bio:{type:String,trim:true},
 skills:{type:[String],trim:true},
 profileImage:{type:String,trim:true,default:'https://cdn-icons-png.flaticon.com/512/6596/6596121.png'},
