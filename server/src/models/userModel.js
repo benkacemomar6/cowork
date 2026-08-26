@@ -8,10 +8,11 @@ role:{type:String,default:'client',enum:['client','admin','freelancer']},
 bio:{type:String,trim:true},
 skills:{type:[String],trim:true},
 profileImage:{type:String,trim:true,default:'https://cdn-icons-png.flaticon.com/512/6596/6596121.png'},
+refreshTokens:[String],
 
 isVerified:{type:Boolean,default:false},
 isBlocked:{type:Boolean,default:false},
 
 },{timestamps:true})
 const userModel = mongoose.model('User',userSchema);
-module.exports = userModel;
+module.exports = userModel; 

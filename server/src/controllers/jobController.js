@@ -1,4 +1,4 @@
-const {createJob,listJob,updateJob,deleteJob,getJob}=require('../services/jobService')
+const {createJob,listJob,updateJob,deleteJob,getJob,getMyConversations}=require('../services/jobService')
 async function create(req,res,next) {
     const { title, description, category, budget }=req.body;
     const clientId=req.user.userId;
@@ -62,4 +62,12 @@ async function create(req,res,next) {
         }
         
     }
-    module.exports = { create ,list,getOne,update,delate};
+    async function myConversations(req,res,next) {
+        try {
+            const conversations = await getMyConversations(req.user.userId);
+            res.status(200).json(conversations);
+        } catch (error) {
+            next(error)
+        }
+    }
+    module.exports = { create ,list,getOne,update,delate,myConversations};

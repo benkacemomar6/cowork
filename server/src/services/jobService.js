@@ -1,5 +1,6 @@
 const { ObjectId } = require("mongodb");
 const jobModel=require("../models/jobModel");
+const proposalModel=require("../models/proposalModel");
 const AppError = require("../utils/AppError");
 async function createJob({client, title, description, category, budget }){
       return await jobModel.create({
@@ -57,4 +58,40 @@ async function deleteJob({jobId,userId}){
     
 
 
-module.exports={createJob,listJob,getJob,updateJob,deleteJob};
+async function getMyConversations(userId) {
+    const clientJobs = await jobModel
+        .find({ client: userId, status: 'in_progress', acceptedProposal: { $ne: null } })
+        .populate({ path: 'acceptedProposal', populate: { path: 'freelancerId', select: 'name' } });
+
+    const freelancerProposals = await proposalModel
+        .find({ freelancerId: userId, status: 'accepted' })
+        .populate({ path: 'jobId', populate: { path: 'client', select: 'name' } });
+
+    const fromClientSide = clientJobs
+        .filter((job) => job.acceptedProposal && job.acceptedProposal.freelancerId)
+        .map((job) => ({
+            jobId: job._id,
+            jobTitle: job.title,
+            jobStatus: job.status,
+            otherParticipant: {
+                id: job.acceptedProposal.freelancerId._id,
+                name: job.acceptedProposal.freelancerId.name,
+            },
+        }));
+
+    const fromFreelancerSide = freelancerProposals
+        .filter((p) => p.jobId && p.jobId.status === 'in_progress')
+        .map((p) => ({
+            jobId: p.jobId._id,
+            jobTitle: p.jobId.title,
+            jobStatus: p.jobId.status,
+            otherParticipant: {
+                id: p.jobId.client._id,
+                name: p.jobId.client.name,
+            },
+        }));
+
+    return [...fromClientSide, ...fromFreelancerSide];
+}
+
+module.exports={createJob,listJob,getJob,updateJob,deleteJob,getMyConversations};

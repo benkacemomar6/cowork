@@ -1,4 +1,4 @@
-const {registerUser,loginUser} = require('../services/authService');
+const {registerUser,loginUser,refreshAccessToken} = require('../services/authService');
 
 
 async function register(req,res,next){
@@ -23,4 +23,16 @@ async function login(req,res,next) {
     }
     
 }
-    module.exports = { register ,login};
+async function refresh(req,res,next) {
+    try {
+        const {refreshToken} =req.body
+        const result= await refreshAccessToken({refreshToken});
+        res.status(200).json(result)
+        
+    } catch (error) {
+        next(error)
+        
+    }
+    
+}
+    module.exports = { register ,login,refresh};

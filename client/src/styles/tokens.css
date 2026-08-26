@@ -1,0 +1,855 @@
+/* ============================================================
+   CoWork design tokens
+   A freelance marketplace is a ledger of contracts between two
+   people: dark ink desk, warm paper documents laid on top of it,
+   amber for the pen you sign with. Numbers (money, bids, ratings,
+   dates, ids) are always set in monospace — this is the one rule
+   applied everywhere, no exceptions, because a ledger's numbers
+   must always look like numbers, not like prose.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+    /* --- surfaces --- */
+    --color-ink: #14171F;
+    --color-ink-raised: #1B1F2A;
+    --color-ink-line: rgba(247, 245, 240, 0.11);
+    --color-ink-line-strong: rgba(247, 245, 240, 0.2);
+
+    --color-paper: #F7F5F0;
+    --color-paper-dim: #EDE8DE;
+    --color-paper-line: rgba(20, 23, 31, 0.12);
+    --color-paper-line-strong: rgba(20, 23, 31, 0.22);
+
+    /* --- accents --- */
+    --color-amber: #E8A33D;
+    --color-amber-strong: #C97F1F;
+    --color-amber-soft: rgba(232, 163, 61, 0.16);
+
+    --color-slate: #8891A3;
+    --color-slate-soft: rgba(136, 145, 163, 0.16);
+
+    --color-green: #4F9A73;
+    --color-green-soft: rgba(79, 154, 115, 0.16);
+
+    --color-rust: #C1503D;
+    --color-rust-soft: rgba(193, 80, 61, 0.16);
+
+    /* --- text --- */
+    --text-on-ink: #F2EFE8;
+    --text-on-ink-dim: var(--color-slate);
+    --text-on-paper: #14171F;
+    --text-on-paper-dim: #5A5F6B;
+
+    /* --- type --- */
+    --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
+
+    /* --- spacing --- */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+    --space-8: 4rem;
+
+    /* --- shape --- */
+    --radius-sm: 3px;
+    --radius-md: 6px;
+    --radius-pill: 999px;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35), 0 16px 32px -16px rgba(0, 0, 0, 0.55);
+
+    /* --- motion --- */
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 150ms var(--ease);
+    --transition-med: 240ms var(--ease);
+
+    --container-width: 860px;
+}
+
+/* ============================================================
+   Reset & base
+   ============================================================ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    background: var(--color-ink);
+    color: var(--text-on-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+#app {
+    min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    margin: 0 0 var(--space-2);
+    color: inherit;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.7rem; }
+h3 { font-size: 1.2rem; }
+h4 { font-size: 1.02rem; }
+
+p {
+    margin: 0 0 var(--space-3);
+}
+
+a {
+    color: var(--color-amber);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+ul { margin: 0; padding: 0; list-style: none; }
+
+/* keyboard focus — visible everywhere, keyboard-only */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* on warm paper the standard amber falls below the 3:1 UI-contrast minimum
+   (~1.8:1) — use the darker amber so focus stays clearly visible on cards */
+.card :focus-visible {
+    outline-color: var(--color-amber-strong);
+}
+
+/* ============================================================
+   Layout helpers
+   ============================================================ */
+
+.container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-5) var(--space-8);
+}
+
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.stack--sm { gap: var(--space-2); }
+.stack--lg { gap: var(--space-6); }
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.row > .field {
+    flex: 1 1 160px;
+}
+
+.section {
+    margin: var(--space-7) 0;
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-ink-line);
+}
+
+.section:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
+.section-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--color-slate);
+    margin: 0 0 var(--space-2);
+}
+
+.empty-state {
+    color: var(--color-slate);
+    font-style: italic;
+    padding: var(--space-4) 0;
+}
+
+.hint {
+    font-size: 0.85rem;
+    color: var(--color-slate);
+    border-left: 2px solid var(--color-ink-line-strong);
+    padding-left: var(--space-3);
+    margin: 0 0 var(--space-4);
+}
+
+.error-text {
+    color: var(--color-rust);
+    background: var(--color-rust-soft);
+    border: 1px solid rgba(193, 80, 61, 0.35);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.9rem;
+}
+
+.success-text {
+    color: var(--color-green);
+    background: var(--color-green-soft);
+    border: 1px solid rgba(79, 154, 115, 0.35);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.9rem;
+}
+
+.loading-state {
+    color: var(--color-slate);
+    padding: var(--space-6) 0;
+}
+
+/* narrow centered card for auth-style single-form pages */
+.auth-shell {
+    max-width: 420px;
+    margin: var(--space-8) auto;
+    padding: 0 var(--space-5);
+}
+
+/* ============================================================
+   Card — warm paper surface, used sparingly
+   ============================================================ */
+
+.card {
+    background: var(--color-paper);
+    color: var(--text-on-paper);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    padding: var(--space-5);
+}
+
+.card + .card {
+    margin-top: var(--space-4);
+}
+
+.card h1, .card h2, .card h3, .card h4 {
+    color: var(--text-on-paper);
+}
+
+.card p {
+    color: var(--text-on-paper-dim);
+}
+
+.card a {
+    color: var(--color-amber-strong);
+}
+
+.card .eyebrow {
+    color: var(--text-on-paper-dim);
+}
+
+.card-lede {
+    font-size: 1.1rem;
+}
+
+.card-footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-paper-line);
+}
+
+.card .ledger-row {
+    border-bottom-color: var(--color-paper-line);
+}
+
+.card .ledger-row-meta {
+    color: var(--text-on-paper-dim);
+}
+
+.card .ledger-row:hover {
+    background: rgba(201, 127, 31, 0.08);
+    border-color: var(--color-amber-strong);
+}
+
+/* ============================================================
+   Ledger row — the signature list pattern.
+   Label on the left, right-aligned monospace value on the right,
+   separated by a hairline. Used for jobs, proposals, milestones,
+   reviews — anything that reads like a line in a contract ledger.
+   ============================================================ */
+
+.ledger-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--color-ink-line);
+    transition: background var(--transition-fast), padding-left var(--transition-fast), border-color var(--transition-fast);
+}
+
+.ledger-row:last-child {
+    border-bottom: none;
+}
+
+a.ledger-row,
+.ledger-row--interactive {
+    color: inherit;
+    cursor: pointer;
+}
+
+.ledger-row:hover {
+    text-decoration: none;
+    padding-left: var(--space-3);
+    border-color: var(--color-amber);
+    background: rgba(232, 163, 61, 0.05);
+}
+
+.ledger-row-label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+}
+
+.ledger-row-title {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: inherit;
+}
+
+.ledger-row-meta {
+    font-size: 0.85rem;
+    color: var(--color-slate);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    align-items: center;
+}
+
+.ledger-row-body {
+    font-size: 0.92rem;
+    color: var(--color-slate);
+    margin-top: var(--space-1);
+}
+
+.ledger-row-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+    flex-shrink: 0;
+}
+
+.ledger-row-actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.ledger-row--unread,
+.ledger-row--selected {
+    border-left: 2px solid var(--color-amber);
+    padding-left: var(--space-3);
+}
+
+.ledger-row--selected {
+    background: rgba(232, 163, 61, 0.08);
+}
+
+/* ============================================================
+   Numbers — mono everywhere: money, bids, ratings, dates, ids
+   ============================================================ */
+
+.num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+}
+
+.rating-line {
+    margin-top: var(--space-3);
+    font-size: 1.1rem;
+}
+
+.rating-line-meta {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: var(--text-on-paper-dim);
+}
+
+/* ============================================================
+   Pills — status badges
+   ============================================================ */
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 0.3em 0.7em;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    line-height: 1.4;
+    white-space: nowrap;
+    background: var(--color-slate-soft);
+    color: var(--color-slate);
+    border-color: rgba(136, 145, 163, 0.35);
+}
+
+.pill--amber {
+    background: var(--color-amber-soft);
+    color: var(--color-amber);
+    border-color: rgba(232, 163, 61, 0.4);
+}
+
+.pill--green {
+    background: var(--color-green-soft);
+    color: var(--color-green);
+    border-color: rgba(79, 154, 115, 0.4);
+}
+
+.pill--rust {
+    background: var(--color-rust-soft);
+    color: var(--color-rust);
+    border-color: rgba(193, 80, 61, 0.4);
+}
+
+.pill--slate {
+    background: var(--color-slate-soft);
+    color: var(--color-slate);
+    border-color: rgba(136, 145, 163, 0.35);
+}
+
+/* ============================================================
+   Messages page — conversation list + thread pane
+   ============================================================ */
+
+.messages-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--space-5);
+    align-items: start;
+}
+
+.messages-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.messages-thread-pane {
+    min-height: 26rem;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 720px) {
+    .messages-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================================
+   Message thread — correspondence attached to a contract
+   ============================================================ */
+
+.message-thread {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    max-height: 22rem;
+    overflow-y: auto;
+    padding-right: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.message-bubble {
+    max-width: 75%;
+    align-self: flex-start;
+    background: var(--color-paper-dim);
+    color: var(--text-on-paper);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: 0.92rem;
+}
+
+.message-bubble--mine {
+    align-self: flex-end;
+    background: var(--color-amber-soft);
+}
+
+.message-bubble p {
+    margin: 0;
+}
+
+.message-meta {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-on-paper-dim);
+    margin-top: var(--space-1);
+}
+
+.message-form {
+    flex-direction: row;
+    max-width: none;
+    gap: var(--space-2);
+}
+
+.message-form input {
+    flex: 1;
+}
+
+/* ============================================================
+   Forms
+   ============================================================ */
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 480px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.filter-bar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-3);
+    max-width: none;
+    margin: 0 0 var(--space-6);
+}
+
+.filter-bar .field {
+    flex: 1 1 150px;
+}
+
+.filter-bar input, .filter-bar select {
+    width: 100%;
+}
+
+/* .field--on-ink: for a .field that sits directly on the dark page,
+   outside any .card (the filter bar, the milestone deliverable-link
+   input). Kept as a plain class modifier — not an #id — so it can't
+   out-rank .card's rules on specificity, the way the earlier bug did. */
+.field--on-ink label {
+    color: var(--color-slate);
+}
+
+.field--on-ink input,
+.field--on-ink textarea,
+.field--on-ink select {
+    background: var(--color-ink-raised);
+    border-color: var(--color-ink-line-strong);
+    color: var(--text-on-ink);
+}
+
+.field label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-on-paper-dim);
+}
+
+.card label {
+    color: var(--text-on-paper-dim);
+}
+
+input, textarea, select {
+    font: inherit;
+    padding: 0.6em 0.75em;
+    border: 1px solid var(--color-paper-line-strong);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    color: var(--text-on-paper);
+}
+
+.card input, .card textarea, .card select {
+    background: #fff;
+    border-color: var(--color-paper-line-strong);
+    color: var(--text-on-paper);
+}
+
+input::placeholder, textarea::placeholder {
+    color: var(--color-slate);
+    opacity: 0.8;
+}
+
+textarea {
+    min-height: 6rem;
+    resize: vertical;
+}
+
+input[type="number"] {
+    font-family: var(--font-mono);
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+
+button, .btn {
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.65em 1.15em;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    cursor: pointer;
+    background: var(--color-amber);
+    color: var(--color-ink);
+    width: fit-content;
+    transition: background var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast), opacity var(--transition-fast);
+}
+
+button:hover:not(:disabled), .btn:hover:not(:disabled) {
+    background: var(--color-amber-strong);
+    transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-on-ink);
+    border-color: var(--color-ink-line-strong);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--color-slate);
+}
+
+.card .btn-secondary {
+    color: var(--text-on-paper);
+    border-color: var(--color-paper-line-strong);
+}
+
+.card .btn-secondary:hover:not(:disabled) {
+    background: rgba(20, 23, 31, 0.05);
+    border-color: var(--color-slate);
+}
+
+.btn-danger {
+    background: transparent;
+    color: var(--color-rust);
+    border-color: rgba(193, 80, 61, 0.45);
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: var(--color-rust-soft);
+}
+
+.btn-sm {
+    padding: 0.4em 0.8em;
+    font-size: 0.8rem;
+}
+
+/* ============================================================
+   Navbar
+   ============================================================ */
+
+.navbar {
+    background: var(--color-ink-raised);
+    border-bottom: 1px solid var(--color-ink-line);
+}
+
+.navbar-inner {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: var(--space-3) var(--space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+}
+
+.navbar-brand {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: var(--text-on-ink);
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-right: auto;
+}
+
+.navbar-brand:hover {
+    text-decoration: none;
+    color: var(--text-on-ink);
+}
+
+.navbar-brand::before {
+    content: '';
+    width: 0.55em;
+    height: 0.55em;
+    border-radius: 50%;
+    background: var(--color-amber);
+    display: inline-block;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+}
+
+.navbar-link {
+    font-family: var(--font-sans);
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-slate);
+    padding: 0.3em 0;
+    border-bottom: 1px solid transparent;
+    transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.navbar-link:hover {
+    text-decoration: none;
+    color: var(--text-on-ink);
+}
+
+.navbar-link.active {
+    color: var(--color-amber);
+    border-bottom-color: var(--color-amber);
+}
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-left: var(--space-5);
+    border-left: 1px solid var(--color-ink-line);
+}
+
+.navbar-avatar {
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: var(--color-amber);
+    color: var(--color-ink);
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.navbar-name {
+    font-size: 0.85rem;
+    color: var(--text-on-ink-dim);
+}
+
+@media (max-width: 640px) {
+    .navbar-inner {
+        gap: var(--space-3);
+    }
+
+    .navbar-user {
+        border-left: none;
+        padding-left: 0;
+        width: 100%;
+        justify-content: space-between;
+        order: 3;
+        margin-top: var(--space-2);
+        padding-top: var(--space-3);
+        border-top: 1px solid var(--color-ink-line);
+    }
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 640px) {
+    .container {
+        padding: var(--space-5) var(--space-4) var(--space-6);
+    }
+
+    h1 { font-size: 1.85rem; }
+    h2 { font-size: 1.4rem; }
+
+    .ledger-row {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .ledger-row-value {
+        align-items: flex-start;
+        text-align: left;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .ledger-row-actions {
+        justify-content: flex-start;
+    }
+
+    form {
+        max-width: none;
+    }
+}

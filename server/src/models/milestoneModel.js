@@ -5,7 +5,8 @@ const milestoneSchema = new mongoose.Schema({
     description:{type:String,required:true,trim:true},
     amount:{type:Number,required:true},
 status:{type:String,default:'pending',enum:['pending','submitted','approved','revision_requested']},
-deliverableUrl:{type:String,trim:true}
+deliverableUrl:{type:String,trim:true},
+approvedAt:{type:Date,default:null}
 },{timestamps:true})
 const milestoneModel = mongoose.model('Milestone',milestoneSchema);
 module.exports = milestoneModel;
