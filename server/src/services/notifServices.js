@@ -1,7 +1,8 @@
 const notificationModel = require('../models/notificationModel');
 const AppError = require('../utils/AppError');
+const { getIO } = require('../socket');
 
-// Reusable — called from OTHER services (proposalService.accept(), 
+// Reusable — called from OTHER services (proposalService.accept(),
 // milestoneService.submit(), etc.) to create a notification for someone.
 async function createNotification(jobId, senderId, userId, type, message) {
     const notification = new notificationModel({
@@ -12,6 +13,15 @@ async function createNotification(jobId, senderId, userId, type, message) {
         message,
     });
     await notification.save();
+
+    // push it live to the recipient's room if they're connected — the
+    // client falls back to fetching on page load either way, so a socket
+    // that isn't up yet (or in scripts that don't boot server.js) is fine.
+    const io = getIO();
+    if (io) {
+        io.to(userId.toString()).emit('new_notification', notification);
+    }
+
     return notification;
 }
 

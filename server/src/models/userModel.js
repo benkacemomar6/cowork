@@ -13,6 +13,13 @@ refreshTokens:[String],
 isVerified:{type:Boolean,default:false},
 isBlocked:{type:Boolean,default:false},
 
+// store only the SHA-256 hash of these tokens — never the raw value —
+// so a DB read alone can't be replayed to verify/reset someone's account
+verificationTokenHash:{type:String,select:false},
+verificationTokenExpires:{type:Date,select:false},
+resetPasswordTokenHash:{type:String,select:false},
+resetPasswordExpires:{type:Date,select:false},
+
 },{timestamps:true})
 const userModel = mongoose.model('User',userSchema);
 module.exports = userModel; 

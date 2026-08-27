@@ -42,6 +42,8 @@ async function accept(req, res, next) {
         const userId = req.user.userId;
         const proposalId = req.params.id;
         const result = await acceptProposal({proposalId, userId});
+        // live notification push (accepted freelancer + rejected siblings)
+        // happens inside acceptProposal via createNotification
         res.status(200).json(result);
     } catch (error) {
         next(error);
@@ -63,6 +65,7 @@ async function reject(req, res, next) {
         const proposalId = req.params.id;
         const userId = req.user.userId;
         const result = await rejectProposal({proposalId, userId});
+        // live notification push happens inside rejectProposal via createNotification
         res.status(200).json(result);
     } catch (error) {
         next(error);

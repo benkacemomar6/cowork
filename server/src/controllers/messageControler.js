@@ -7,6 +7,12 @@ async function sendMessageController(req, res, next) {
         const { content } = req.body;
 
         const message = await sendMessage(jobId, senderId, content);
+
+        const io = req.app.get('io');
+        if (io) {
+            io.to(message.receiverId.toString()).emit('new_message', message);
+        }
+
         res.status(201).json({ success: true, data: message });
     } catch (error) {
         next(error);

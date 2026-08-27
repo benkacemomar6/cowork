@@ -10,11 +10,11 @@ async function platfomStat() {
     return { totalUsers, totalJobs, completedJobs };
 }
 async function getAllUsers() {
-    const users = await usermodel.find();
+    const users = await usermodel.find().select('-password -refreshTokens');
     return users;
 }
 async function banUnbanUser(userId) {
-    const user=await usermodel.findById(userId);
+    const user=await usermodel.findById(userId).select('-password -refreshTokens');
     if(!user){
         throw new AppError("user not found ",404)
     }
@@ -25,7 +25,7 @@ async function banUnbanUser(userId) {
 
 }
 async function getUserById(userId) {
-    const user = await usermodel.findById(userId);
+    const user = await usermodel.findById(userId).select('-password -refreshTokens');
     if (!user) {
         throw new AppError('User not found', 404);
     }

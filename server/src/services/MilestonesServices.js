@@ -80,6 +80,13 @@ async function approveMilestone({milestoneId, userId}) {
         );
     }
 
+    const allMilestones = await millModel.find({ jobId: job._id });
+    const allApproved = allMilestones.length > 0 && allMilestones.every((m) => m.status === 'approved');
+    if (allApproved && job.status !== 'completed') {
+        job.status = 'completed';
+        await job.save();
+    }
+
     return approvedMilestone;
 }
 async function requestRevision({milestoneId, userId}) {
@@ -99,4 +106,13 @@ async function requestRevision({milestoneId, userId}) {
     }
     const revisionRequestedMilestone = await millModel.findByIdAndUpdate(milestoneId, {status:'revision_requested'}, {new:true})
     return revisionRequestedMilestone;
-}module.exports = { createMilestone, submitMilestone, approveMilestone, requestRevision };
+}
+async function listMilestonesForJob({ jobId }) {
+    const job = await jobModel.findById(jobId);
+    if (!job) {
+        throw new AppError("there is no job with this id", 404)
+    }
+    const milestones = await millModel.find({ jobId }).sort({ createdAt: 1 });
+    return milestones;
+}
+module.exports = { createMilestone, submitMilestone, approveMilestone, requestRevision, listMilestonesForJob };

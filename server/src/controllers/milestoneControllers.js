@@ -1,4 +1,4 @@
-const { createMilestone, submitMilestone, approveMilestone, requestRevision } = require('../services/MilestonesServices');
+const { createMilestone, submitMilestone, approveMilestone, requestRevision, listMilestonesForJob } = require('../services/MilestonesServices');
 async function submit(req, res, next) {
     try {
         const milestoneId = req.params.id;
@@ -44,4 +44,14 @@ async function create(req, res, next) {
     }
 }
 
-module.exports = { create, submit, approve, revision };
+async function list(req, res, next) {
+    try {
+        const jobId = req.params.jobId;
+        const milestones = await listMilestonesForJob({ jobId });
+        res.status(200).json({ status: 'success', data: { milestones } });
+    } catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { create, submit, approve, revision, list };
