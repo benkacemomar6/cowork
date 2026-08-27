@@ -3,11 +3,11 @@ import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 function Navbar() {
-    const { user, logout } = useAuth();
+    const { user, logout, unreadCount } = useAuth();   // CHANGED — added unreadCount
     return (
         <nav className="navbar">
             <div className="navbar-inner">
-                <Link to="/" className="navbar-brand">CoWork</Link>
+                <Link to="/" className="navbar-brand">Co<span className="navbar-brand-accent">Work</span></Link>
 
                 <div className="navbar-links">
                     <NavLink to="/jobs" className="navbar-link">Browse Jobs</NavLink>
@@ -21,10 +21,18 @@ function Navbar() {
                     {user && user.role === 'freelancer' && (
                         <NavLink to="/my-proposals" className="navbar-link">My Proposals</NavLink>
                     )}
+                    {user && user.role === 'admin' && (
+                        <NavLink to="/admin" className="navbar-link">Admin</NavLink>
+                    )}
                     {user && (
                         <>
                             <NavLink to="/messages" className="navbar-link">Messages</NavLink>
-                            <NavLink to="/notifications" className="navbar-link">Notifications</NavLink>
+                            <NavLink to="/notifications" className="navbar-link">
+                                Notifications
+                                {unreadCount > 0 && (
+                                    <span className="navbar-badge">{unreadCount}</span>
+                                )}
+                            </NavLink>
                             <NavLink to="/profile" className="navbar-link">Profile</NavLink>
                         </>
                     )}

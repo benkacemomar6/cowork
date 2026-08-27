@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { formatDate } from '../utils/format'
 
 function Messages() {
-    const { user } = useAuth()
+    const { user, socket } = useAuth()   // CHANGED — also grab socket from context
     const [params, setParams] = useSearchParams()
     const selectedJobId = params.get('job') || ''
 
@@ -57,6 +57,29 @@ function Messages() {
             clearInterval(intervalId)
         }
     }, [selectedJobId])
+
+    // NEW — listen for live incoming messages via socket
+    useEffect(() => {
+        if (!socket) return
+
+        function handleNewMessage(message) {
+            // only add it if it belongs to the conversation currently open
+            if (message.jobId === selectedJobId) {
+                setMessages((prev) => {
+                    // avoid duplicating a message we already have (e.g. from polling)
+                    const alreadyExists = prev.some((m) => m._id === message._id)
+                    if (alreadyExists) return prev
+                    return [...prev, message]
+                })
+            }
+        }
+
+        socket.on('new_message', handleNewMessage)
+
+        return () => {
+            socket.off('new_message', handleNewMessage)
+        }
+    }, [socket, selectedJobId])
 
     function selectConversation(jobId) {
         setParams({ job: jobId })

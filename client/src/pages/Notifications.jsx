@@ -1,25 +1,44 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import api from '../api/axios'
+import { useAuth } from '../context/AuthContext'
 import { formatDate } from '../utils/format'
 
 function Notifications() {
+    const { socket, refreshUnreadCount } = useAuth()   // NEW
     const [notifications, setNotifications] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
 
-    useEffect(() => {
-        async function fetchNotifications() {
-            try {
-                const res = await api.get('/notifications')
-                setNotifications(res.data)
-                setLoading(false)
-            } catch (err) {
-                setError(err.response?.data?.message || 'Failed to load notifications')
-                setLoading(false)
-            }
+    // CHANGED — pulled out of useEffect so the socket listener can call it too
+    const fetchNotifications = useCallback(async () => {
+        try {
+            const res = await api.get('/notifications')
+            setNotifications(res.data)
+            setLoading(false)
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to load notifications')
+            setLoading(false)
         }
-        fetchNotifications()
     }, [])
+
+    useEffect(() => {
+        fetchNotifications()
+    }, [fetchNotifications])
+
+    // NEW — refetch whenever a live notification arrives
+    useEffect(() => {
+        if (!socket) return
+
+        function handleNewNotification() {
+            fetchNotifications()
+        }
+
+        socket.on('new_notification', handleNewNotification)
+
+        return () => {
+            socket.off('new_notification', handleNewNotification)
+        }
+    }, [socket, fetchNotifications])
 
     async function handleMarkRead(notificationId) {
         try {
@@ -27,6 +46,7 @@ function Notifications() {
             setNotifications((prev) =>
                 prev.map((n) => (n._id === notificationId ? res.data : n))
             )
+            refreshUnreadCount()
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to update notification')
         }

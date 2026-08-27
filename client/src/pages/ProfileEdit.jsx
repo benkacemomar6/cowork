@@ -4,7 +4,7 @@ import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 
 function ProfileEdit() {
-    const { token, login } = useAuth()
+    const { updateUser } = useAuth()
     const [name, setName] = useState('')
     const [bio, setBio] = useState('')
     const [skills, setSkills] = useState('')
@@ -41,7 +41,7 @@ function ProfileEdit() {
                 bio,
                 skills: skills.split(',').map((s) => s.trim()).filter(Boolean),
             })
-            login(res.data.data, token)
+            updateUser(res.data.data)
             setSaved(true)
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to save profile')

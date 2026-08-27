@@ -94,15 +94,31 @@ function JobDetail() {
     }
 
     // --- Milestones ---
-    // jobMilestoneRoutes.js only exposes POST / (create) — there is no GET / to list
-    // milestones for a job. So this list is only ever populated from what this page
-    // creates or updates during the current session, not fetched from the backend.
     const [milestones, setMilestones] = useState([])
+    const [milestonesLoading, setMilestonesLoading] = useState(false)
     const [milestoneTitle, setMilestoneTitle] = useState('')
     const [milestoneDescription, setMilestoneDescription] = useState('')
     const [milestoneAmount, setMilestoneAmount] = useState('')
     const [milestoneSubmitting, setMilestoneSubmitting] = useState(false)
     const [milestoneError, setMilestoneError] = useState('')
+
+    useEffect(() => {
+        if (!job || (job.status !== 'in_progress' && job.status !== 'completed')) return
+        let cancelled = false
+        async function fetchMilestones() {
+            setMilestonesLoading(true)
+            try {
+                const res = await api.get(`/jobs/${id}/milestones`)
+                if (!cancelled) setMilestones(res.data.data.milestones)
+            } catch (err) {
+                if (!cancelled) setMilestoneError(err.response?.data?.message || 'Failed to load milestones')
+            } finally {
+                if (!cancelled) setMilestonesLoading(false)
+            }
+        }
+        fetchMilestones()
+        return () => { cancelled = true }
+    }, [id, job?.status])
 
     async function handleCreateMilestone(e) {
         e.preventDefault()
@@ -146,6 +162,10 @@ function JobDetail() {
         try {
             const res = await api.patch(`/milestones/${milestoneId}/approve`)
             replaceMilestone(res.data.data.approvedMilestone)
+            // approving the last milestone can flip the job to 'completed' server-side —
+            // refetch so the review section shows up without needing a page reload
+            const jobRes = await api.get(`/jobs/${id}`)
+            setJob(jobRes.data)
         } catch (err) {
             setMilestoneError(err.response?.data?.message || 'Failed to approve milestone')
         }
@@ -265,16 +285,14 @@ function JobDetail() {
                 </section>
             )}
 
-            {job.status === 'in_progress' && (
+            {(job.status === 'in_progress' || job.status === 'completed') && (
                 <section className="section">
                     <h2>Milestones</h2>
-                    <p className="hint">
-                        There's no backend endpoint to list existing milestones for a job yet,
-                        so only milestones created or updated on this page during this visit are shown here.
-                    </p>
+                    {milestonesLoading && <p className="loading-state">Loading milestones&hellip;</p>}
                     {milestoneError && <p className="error-text">{milestoneError}</p>}
+                    {!milestonesLoading && milestones.length === 0 && <p className="empty-state">No milestones yet.</p>}
 
-                    {isOwner && (
+                    {isOwner && job.status === 'in_progress' && (
                         <div className="card">
                             <form onSubmit={handleCreateMilestone}>
                                 <div className="field">

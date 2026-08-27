@@ -144,8 +144,8 @@ function JobList() {
                 </div>
             </form>
 
-            <div>
-                {pageJobs.length === 0 && <p className="empty-state">No jobs match your filters.</p>}
+            {pageJobs.length === 0 && <p className="empty-state">No jobs match your filters.</p>}
+            <div className="job-grid">
                 {pageJobs.map((job) => (
                     <JobCard key={job._id} job={job} />
                 ))}

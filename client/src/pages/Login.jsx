@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
@@ -63,6 +63,9 @@ function Login() {
                     </div>
                     <button type="submit">Log in</button>
                 </form>
+                <div className="card-footer">
+                    <Link to="/forgot-password">Forgot your password?</Link>
+                </div>
             </div>
         </div>
     )

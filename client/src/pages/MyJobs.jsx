@@ -58,18 +58,20 @@ function MyJobs() {
             </div>
 
             {jobs.length === 0 && <p className="empty-state">You haven't posted any jobs yet.</p>}
-            {pageJobs.map((job) => (
-                <JobCard
-                    key={job._id}
-                    job={job}
-                    actions={
-                        <>
-                            <Link to={`/jobs/${job._id}/edit`} className="btn-secondary btn-sm">Edit</Link>
-                            <button className="btn-danger btn-sm" onClick={() => handleDelete(job._id)}>Delete</button>
-                        </>
-                    }
-                />
-            ))}
+            <div className="job-grid">
+                {pageJobs.map((job) => (
+                    <JobCard
+                        key={job._id}
+                        job={job}
+                        actions={
+                            <>
+                                <Link to={`/jobs/${job._id}/edit`} className="btn-secondary btn-sm">Edit</Link>
+                                <button className="btn-danger btn-sm" onClick={() => handleDelete(job._id)}>Delete</button>
+                            </>
+                        }
+                    />
+                ))}
+            </div>
 
             <Pagination page={currentPage} pages={pages} onChange={setPage} />
         </div>
