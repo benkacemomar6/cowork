@@ -3,6 +3,10 @@ import { io } from 'socket.io-client'
 import api from '../api/axios'
 const AuthContext = createContext(null)
 
+// VITE_API_URL may include a trailing /api (it's the axios baseURL) —
+// the socket server listens on the bare origin, not under /api.
+const SOCKET_URL = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '')
+
 function readStoredUser() {
     const raw = localStorage.getItem('user')
     if (!raw) return null
@@ -54,7 +58,7 @@ useEffect(() => {
         return
     }
 
-    const newSocket = io('http://localhost:3000', { withCredentials: true })
+    const newSocket = io(SOCKET_URL, { withCredentials: true })
     newSocket.on('connect', () => {
         newSocket.emit('register', user._id)
     })
