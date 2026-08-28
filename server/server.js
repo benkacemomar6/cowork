@@ -53,7 +53,7 @@ app.get('/api/health', (req, res) => {
 app.use(errorHandler);
 const server= http.createServer(app);
 const io = initSocket(server, {
-    origin: 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
     credentials: true,
 });
 app.set('io', io);
