@@ -16,6 +16,12 @@ function getTransporter() {
         auth: process.env.SMTP_USER
             ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
             : undefined,
+        // Outside production, tolerate a locally-intercepted TLS cert (e.g. an
+        // antivirus mail-scanning shield reissuing smtp.gmail.com's cert) so
+        // registration emails still send in dev instead of failing cert checks.
+        tls: process.env.NODE_ENV === 'production'
+            ? undefined
+            : { rejectUnauthorized: false },
     });
     return transporter;
 }
