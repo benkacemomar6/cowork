@@ -1,53 +1,62 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-let transporter = null;
-let warnedNoTransport = false;
+const SEND_TIMEOUT_MS = 10000;
 
-// Lazy — built on first send so a missing SMTP config doesn't crash the
-// app at require-time, only the send itself degrades (see sendMail below).
-function getTransporter() {
-    if (transporter) return transporter;
-    if (!process.env.SMTP_HOST) return null;
+let resendClient = null;
+let warnedNoApiKey = false;
 
-    transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT) || 587,
-        secure: Number(process.env.SMTP_PORT) === 465,
-        auth: process.env.SMTP_USER
-            ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-            : undefined,
-        // Outside production, tolerate a locally-intercepted TLS cert (e.g. an
-        // antivirus mail-scanning shield reissuing smtp.gmail.com's cert) so
-        // registration emails still send in dev instead of failing cert checks.
-        tls: process.env.NODE_ENV === 'production'
-            ? undefined
-            : { rejectUnauthorized: false },
-    });
-    return transporter;
+// Lazy — built on first send so a missing API key doesn't crash the app at
+// require-time, only the send itself degrades (see sendMail below).
+function getClient() {
+    if (resendClient) return resendClient;
+    if (!process.env.RESEND_API_KEY) return null;
+
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+    return resendClient;
 }
 
-// Sends an email if SMTP_HOST is configured; otherwise logs to the
-// console so auth flows (register/forgot-password) still work end to end
-// in local dev before real SMTP credentials are added to .env.
-async function sendMail({ to, subject, html, text }) {
-    const t = getTransporter();
+// Resend's SDK has no built-in cancellation, and a hung request (bad network
+// path, provider outage) must not hang the calling request forever — race it
+// against a timeout so sendMail always settles.
+function withTimeout(promise, ms) {
+    let timer;
+    const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`Resend request timed out after ${ms}ms`)), ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
 
-    if (!t) {
-        if (!warnedNoTransport) {
-            console.warn('[mailer] SMTP_HOST not set — emails will be logged instead of sent. Configure SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS in server/.env to send for real.');
-            warnedNoTransport = true;
+// Sends an email via Resend (HTTPS, not SMTP — avoids hosts that block/hang
+// outbound SMTP ports) if RESEND_API_KEY is configured; otherwise logs to the
+// console so auth flows (register/forgot-password) still work end to end in
+// local dev before a real API key is added to .env.
+async function sendMail({ to, subject, html, text }) {
+    const client = getClient();
+
+    if (!client) {
+        if (!warnedNoApiKey) {
+            console.warn('[mailer] RESEND_API_KEY not set — emails will be logged instead of sent. Set RESEND_API_KEY in server/.env to send for real.');
+            warnedNoApiKey = true;
         }
         console.log(`[mailer] would send email\n  to: ${to}\n  subject: ${subject}\n  ${text || html}`);
         return { delivered: false };
     }
 
-    await t.sendMail({
-        from: process.env.MAIL_FROM || 'CoWork <no-reply@cowork.local>',
-        to,
-        subject,
-        html,
-        text,
-    });
+    const { error } = await withTimeout(
+        client.emails.send({
+            from: process.env.MAIL_FROM || 'CoWork <no-reply@cowork.local>',
+            to,
+            subject,
+            html,
+            text,
+        }),
+        SEND_TIMEOUT_MS
+    );
+
+    if (error) {
+        throw new Error(error.message || 'Resend API error');
+    }
+
     return { delivered: true };
 }
 
